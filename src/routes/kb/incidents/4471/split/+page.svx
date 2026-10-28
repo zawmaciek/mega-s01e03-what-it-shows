@@ -66,4 +66,10 @@ meeting, which points at a third cause the desk has not opened a ticket for.
 3. Read the tenant's locale and form before you merge, not the subject line. Decision 0001 needs
    a replacement record; this page does not change it.
 
+## Desk update, 5 October
+
+#4471 is closed. Engineering fixed `parser` (`fix(dates): parse dd/mm for eu locales`) and will
+not fix `hint`, because `booking-v3` is retired. Both problems are closed; the split above is
+what the counts show, and it stays here so the next merge reads the tenant, not the subject.
+
 <RenderStamp {signature} />

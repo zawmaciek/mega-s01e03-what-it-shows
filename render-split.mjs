@@ -205,6 +205,11 @@ ${rows}
       a replacement record; this page does not change it.</li>
     </ol>
 
+    <h2>Desk update, 5 October</h2>
+    <p>#4471 is closed. Engineering fixed <code>parser</code> (<code>fix(dates): parse dd/mm for eu locales</code>) and will
+    not fix <code>hint</code>, because <code>booking-v3</code> is retired. Both problems are closed; the split above is
+    what the counts show, and it stays here so the next merge reads the tenant, not the subject.</p>
+
     <p class="stamp">desk ref <b>${deskRef(signature)}</b></p>
   </main>
   <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
