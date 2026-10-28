@@ -1,0 +1,69 @@
+---
+layout: runbook
+title: '#4471 · split: two problems, not one'
+owner: support desk
+status: proposed
+reviewed: 2026-10-28
+signature: v1.eyJzdWIiOiIzNjYzIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMxODM4OTUsImV4cCI6MTc5MzI3MDI5NX0.N15yIa7C1RVKgqsqBFj9n2XSdE2_37eX-AzkxFDYuJM
+---
+
+<script>
+  import SplitTable from '#lib/kb/SplitTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const { signature } = $props();
+</script>
+
+#4471 was opened as one issue: "dates parse mm/dd in eu locales". It is not one issue. The
+export holds **412 unique reports** (427 rows; 15 ids appear twice because the export pages
+overlap) and they come from **two different bugs**.
+
+<Callout kind="warn">
+The desk merged on subject alone ([decision 0001](/kb/decisions/0001-dedupe-by-subject)). The
+two bugs share subjects, so they share a ticket. One fix queued will not close both.
+</Callout>
+
+## The two problems
+
+<SplitTable ticket={4471} />
+
+### `parser` — 379 reports
+
+The shared parser reads every date month first. Every tenant on file writes the day first, so
+their dates come out flipped. This is the bug the ticket describes, and it is the larger one.
+
+- 11 tenants, all of them: harbour.dental 52, kettle.books 47, nine.lanterns 44, morrow.tax 40,
+  long.table 39, ridge.clinic 36, stone.and.sons 30, lantern.row 28, alder.physio 23,
+  pale.harbour 21, copper.studio 19.
+- Every channel: app 204, email 150, form 25.
+- Seen 2026-04-01 → 2026-10-04.
+- Intake tagged 356 of these `parser` and 23 `hint`. Intake reads the browser locale, which is
+  not the tenant's locale, so its tag is a guess.
+
+### `hint` — 33 reports
+
+Three tenants run `booking-v3`, whose date field prints `MM/DD/YYYY`. Their people type what the
+hint tells them, month first, and the form reads it the tenant's way. The date is wrong before
+the parser ever sees it. This is a second bug with a second fix.
+
+- alder.physio 12, copper.studio 11, pale.harbour 10.
+- Form only: 33 of 33.
+- Seen 2026-04-17 → 2026-09-22.
+- Intake tagged 15 of these `parser` and 18 `hint`.
+
+## What the counts do not show
+
+Five reports describe a **one-day** shift, not a month swap: R-41202, R-41209, R-41236,
+R-41344, R-41620. They are filed under `parser` by tenant, as the desk reads them, and they are
+footnoted here rather than counted apart. R-41344 names two clients in two time zones on one
+meeting, which points at a third cause the desk has not opened a ticket for.
+
+## What to do
+
+1. Keep #4471 for `parser`: 379 reports, one fix in the shared parser.
+2. Open a ticket for `hint`: 33 reports, one fix in `booking-v3`'s date field.
+3. Read the tenant's locale and form before you merge, not the subject line. Decision 0001 needs
+   a replacement record; this page does not change it.
+
+<RenderStamp {signature} />

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#4471 · split: two problems, not one · support kb</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --fg: #1d1d1b; --muted: #6b6a66; --line: #e3e0d8;
+    --accent: #2f6f5e; --warn: #b4501f; --warn-bg: #fbeee6; --note-bg: #eef5f2;
+    --mono: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171716; --fg: #ecebe6; --muted: #9c9a93; --line: #34332f;
+      --accent: #6fbfa6; --warn: #f0905d; --warn-bg: #3a2418; --note-bg: #1d2c27;
+    }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; }
+  .kb { max-width: 760px; margin: 0 auto; padding: 2rem 16px 4rem; }
+  .crumb { font: 0.8rem var(--mono); text-decoration: none; color: var(--muted); }
+  h1 { margin: 0.25rem 0 0.5rem; line-height: 1.2; }
+  h2 { margin-top: 2rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; color: var(--muted); font-size: 0.85rem; margin: 0; }
+  .status { border: 1px solid var(--line); border-radius: 99px; padding: 0 0.6rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.92rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; }
+  code { font-family: var(--mono); font-size: 0.88em; }
+  a { color: var(--accent); }
+  aside { border-left: 4px solid var(--accent); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--note-bg); }
+  aside.warn { border-color: var(--warn); background: var(--warn-bg); }
+  .sum { font-size: 1.1rem; }
+  .tags { color: var(--muted); font-size: 0.85em; }
+  .stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); }
+  .stamp b { color: var(--accent); letter-spacing: 0.04em; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="kb">
+  <header>
+    <a class="crumb" href="/kb">support desk · kb</a>
+    <h1>#4471 · split: two problems, not one</h1>
+    <p class="meta">
+      <span>owner <b>support desk</b></span>
+      <span class="status proposed">proposed</span>
+      <span>reviewed 2026-10-28 · 0 days ago</span>
+    </p>
+  </header>
+  <main>
+    <p>#4471 was opened as one issue: "dates parse mm/dd in eu locales". It is not one issue. The
+    export holds <strong>412 unique reports</strong> (427 rows; 15 ids appear twice because the export pages
+    overlap) and they come from <strong>two different bugs</strong>.</p>
+
+    <aside class="warn">The desk merged on subject alone (<a href="/kb/decisions/0001-dedupe-by-subject">decision 0001</a>). The
+    two bugs share subjects, so they share a ticket. One fix queued will not close both.</aside>
+
+    <h2>The two problems</h2>
+
+    <p class="sum"><strong>412</strong> reports merged into #4471 · <strong>2</strong> problems</p>
+    <table>
+      <thead>
+        <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>seen</th></tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><code>parser</code></td>
+        <td>379</td>
+        <td>11</td>
+        <td class="tags">app ×204 · email ×150 · form ×25</td>
+        <td>2026-04-01 → 2026-10-04</td>
+      </tr>
+      <tr>
+        <td><code>hint</code></td>
+        <td>33</td>
+        <td>3</td>
+        <td class="tags">form ×33</td>
+        <td>2026-04-17 → 2026-09-22</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3><code>parser</code> — 379 reports</h3>
+    <p>The shared parser reads every date month first. Every tenant on file writes the day first, so
+    their dates come out flipped. This is the bug the ticket describes, and it is the larger one.</p>
+    <ul>
+      <li>11 tenants, all of them: harbour.dental 52, kettle.books 47, nine.lanterns 44, morrow.tax 40,
+      long.table 39, ridge.clinic 36, stone.and.sons 30, lantern.row 28, alder.physio 23,
+      pale.harbour 21, copper.studio 19.</li>
+      <li>Every channel: app 204, email 150, form 25.</li>
+      <li>Seen 2026-04-01 → 2026-10-04.</li>
+      <li>Intake tagged 356 of these <code>parser</code> and 23 <code>hint</code>. Intake reads the browser locale, which is
+      not the tenant's locale, so its tag is a guess.</li>
+    </ul>
+
+    <h3><code>hint</code> — 33 reports</h3>
+    <p>Three tenants run <code>booking-v3</code>, whose date field prints <code>MM/DD/YYYY</code>. Their people type what the
+    hint tells them, month first, and the form reads it the tenant's way. The date is wrong before
+    the parser ever sees it. This is a second bug with a second fix.</p>
+    <ul>
+      <li>alder.physio 12, copper.studio 11, pale.harbour 10.</li>
+      <li>Form only: 33 of 33.</li>
+      <li>Seen 2026-04-17 → 2026-09-22.</li>
+      <li>Intake tagged 15 of these <code>parser</code> and 18 <code>hint</code>.</li>
+    </ul>
+
+    <h2>What the counts do not show</h2>
+    <p>Five reports describe a <strong>one-day</strong> shift, not a month swap: R-41202, R-41209, R-41236, R-41344, R-41620. They are filed under <code>parser</code> by tenant, as the desk reads them, and they are
+    footnoted here rather than counted apart. R-41344 names two clients in two time zones on one
+    meeting, which points at a third cause the desk has not opened a ticket for.</p>
+
+    <h2>What to do</h2>
+    <ol>
+      <li>Keep #4471 for <code>parser</code>: 379 reports, one fix in the shared parser.</li>
+      <li>Open a ticket for <code>hint</code>: 33 reports, one fix in <code>booking-v3</code>'s date field.</li>
+      <li>Read the tenant's locale and form before you merge, not the subject line. Decision 0001 needs
+      a replacement record; this page does not change it.</li>
+    </ol>
+
+    <p class="stamp">desk ref <b>DR-F5DA-71R3</b></p>
+  </main>
+  <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
+</div>
+</body>
+</html>
